@@ -1,0 +1,167 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:template_name",
+ "creation": "2026-05-13 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "template_name",
+  "status",
+  "language_code",
+  "column_break_1",
+  "category",
+  "account",
+  "meta_template_id",
+  "for_doctype",
+  "section_content",
+  "header_type",
+  "header_text",
+  "body_text",
+  "column_break_content",
+  "footer_text",
+  "sample_values",
+  "field_names",
+  "section_preview",
+  "preview_html"
+ ],
+ "fields": [
+  {
+   "fieldname": "template_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "in_standard_filter": 1,
+   "label": "Template Name",
+   "reqd": 1,
+   "unique": 1,
+   "description": "Must match the exact template name registered in Meta Business Manager"
+  },
+  {
+   "default": "Pending",
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Status",
+   "options": "Pending\nApproved\nRejected\nPaused"
+  },
+  {
+   "default": "en",
+   "fieldname": "language_code",
+   "fieldtype": "Data",
+   "label": "Language Code",
+   "description": "e.g. en, en_US, ar"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "UTILITY",
+   "fieldname": "category",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Category",
+   "options": "MARKETING\nUTILITY\nAUTHENTICATION"
+  },
+  {
+   "fieldname": "account",
+   "fieldtype": "Link",
+   "label": "WhatsApp Account",
+   "options": "DL WhatsApp Account"
+  },
+  {
+   "fieldname": "meta_template_id",
+   "fieldtype": "Data",
+   "label": "Meta Template ID",
+   "read_only": 1
+  },
+  {
+   "fieldname": "for_doctype",
+   "fieldtype": "Link",
+   "label": "For DocType",
+   "options": "DocType",
+   "description": "Restrict this template to a specific DocType"
+  },
+  {
+   "fieldname": "section_content",
+   "fieldtype": "Section Break",
+   "label": "Template Content"
+  },
+  {
+   "fieldname": "header_type",
+   "fieldtype": "Select",
+   "label": "Header Type",
+   "options": "\nTEXT\nIMAGE\nDOCUMENT\nVIDEO"
+  },
+  {
+   "depends_on": "eval:doc.header_type=='TEXT'",
+   "fieldname": "header_text",
+   "fieldtype": "Small Text",
+   "label": "Header Text"
+  },
+  {
+   "fieldname": "body_text",
+   "fieldtype": "Text",
+   "label": "Body Text",
+   "description": "Use {{1}}, {{2}} etc for dynamic variables"
+  },
+  {
+   "fieldname": "column_break_content",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "footer_text",
+   "fieldtype": "Small Text",
+   "label": "Footer Text"
+  },
+  {
+   "fieldname": "sample_values",
+   "fieldtype": "Small Text",
+   "label": "Sample Values",
+   "description": "Comma-separated sample values for variables (e.g. John,INV-0001)"
+  },
+  {
+   "fieldname": "field_names",
+   "fieldtype": "Small Text",
+   "label": "Field Names",
+   "description": "Comma-separated field names from the linked DocType (e.g. customer_name,name)"
+  },
+  {
+   "fieldname": "section_preview",
+   "fieldtype": "Section Break",
+   "label": "Preview",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "preview_html",
+   "fieldtype": "HTML",
+   "label": "Preview"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "DlWhatsApp",
+ "name": "DL WhatsApp Template",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

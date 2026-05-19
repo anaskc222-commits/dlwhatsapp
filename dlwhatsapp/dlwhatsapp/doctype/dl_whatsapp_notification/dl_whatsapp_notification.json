@@ -1,0 +1,141 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:notification_name",
+ "creation": "2026-05-13 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "notification_name",
+  "enabled",
+  "column_break_1",
+  "document_type",
+  "event",
+  "section_recipient",
+  "recipient_type",
+  "phone_field",
+  "static_phone",
+  "column_break_r",
+  "template",
+  "field_names",
+  "section_conditions",
+  "conditions"
+ ],
+ "fields": [
+  {
+   "fieldname": "notification_name",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Notification Name",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "default": "1",
+   "fieldname": "enabled",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Enabled"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "document_type",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Type",
+   "options": "DocType",
+   "reqd": 1
+  },
+  {
+   "fieldname": "event",
+   "fieldtype": "Select",
+   "in_list_view": 1,
+   "label": "Event",
+   "options": "after_insert\non_update\non_submit\non_cancel\non_trash",
+   "reqd": 1
+  },
+  {
+   "fieldname": "section_recipient",
+   "fieldtype": "Section Break",
+   "label": "Recipient & Message"
+  },
+  {
+   "default": "Field",
+   "fieldname": "recipient_type",
+   "fieldtype": "Select",
+   "label": "Recipient Type",
+   "options": "Field\nStatic Number"
+  },
+  {
+   "depends_on": "eval:doc.recipient_type=='Field'",
+   "fieldname": "phone_field",
+   "fieldtype": "Data",
+   "label": "Phone Field",
+   "description": "Field name in the DocType that holds the phone number (e.g. mobile_no)"
+  },
+  {
+   "depends_on": "eval:doc.recipient_type=='Static Number'",
+   "fieldname": "static_phone",
+   "fieldtype": "Data",
+   "label": "Static Phone Number"
+  },
+  {
+   "fieldname": "column_break_r",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "template",
+   "fieldtype": "Link",
+   "label": "Template",
+   "options": "DL WhatsApp Template"
+  },
+  {
+   "fieldname": "field_names",
+   "fieldtype": "Small Text",
+   "label": "Template Field Names",
+   "description": "Comma-separated field names to fill template variables"
+  },
+  {
+   "fieldname": "section_conditions",
+   "fieldtype": "Section Break",
+   "label": "Conditions",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "conditions",
+   "fieldtype": "Code",
+   "label": "Conditions (Python)",
+   "options": "Python",
+   "description": "Python expression — return True to send. 'doc' is the document. Example: doc.status == 'Submitted'"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2026-05-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "DlWhatsApp",
+ "name": "DL WhatsApp Notification",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

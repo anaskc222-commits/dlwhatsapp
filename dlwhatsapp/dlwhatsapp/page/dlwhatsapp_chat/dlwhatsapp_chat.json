@@ -1,0 +1,23 @@
+{
+ "creation": "2026-05-13 00:00:00.000000",
+ "doctype": "Page",
+ "modified": "2026-05-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "DlWhatsApp",
+ "name": "dlwhatsapp-chat",
+ "owner": "Administrator",
+ "page_name": "dlwhatsapp-chat",
+ "restrict_to_domain": "",
+ "roles": [
+  {
+   "role": "System Manager"
+  },
+  {
+   "role": "WhatsApp User"
+  }
+ ],
+ "script": null,
+ "standard": "Yes",
+ "system_page": 0,
+ "title": "DL WhatsApp"
+}

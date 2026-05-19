@@ -1,0 +1,138 @@
+{
+ "actions": [],
+ "creation": "2026-05-13 00:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "section_provider",
+  "default_account",
+  "provider",
+  "column_break_1",
+  "enable_auto_read_receipt",
+  "enable_notifications",
+  "section_urls",
+  "public_base_url",
+  "section_twilio",
+  "twilio_account_sid",
+  "twilio_auth_token",
+  "column_break_tw",
+  "twilio_phone_number",
+  "section_erpnext",
+  "pdf_print_formats"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_provider",
+   "fieldtype": "Section Break",
+   "label": "General Settings"
+  },
+  {
+   "fieldname": "default_account",
+   "fieldtype": "Link",
+   "label": "Default Account",
+   "options": "DL WhatsApp Account"
+  },
+  {
+   "default": "Meta (WhatsApp Business API)",
+   "fieldname": "provider",
+   "fieldtype": "Select",
+   "label": "Provider",
+   "options": "Meta (WhatsApp Business API)\nTwilio\nD360 (360dialog)"
+  },
+  {
+   "fieldname": "column_break_1",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_auto_read_receipt",
+   "fieldtype": "Check",
+   "label": "Enable Auto Read Receipt"
+  },
+  {
+   "default": "1",
+   "fieldname": "enable_notifications",
+   "fieldtype": "Check",
+   "label": "Enable Automated Notifications"
+  },
+  {
+   "fieldname": "section_urls",
+   "fieldtype": "Section Break",
+   "label": "Server URL"
+  },
+  {
+   "fieldname": "public_base_url",
+   "fieldtype": "Data",
+   "label": "Public Base URL",
+   "description": "Public URL of your server used for WhatsApp media links (e.g. https://erp.dlitsksa.com). Must be reachable from the internet.",
+   "placeholder": "https://erp.yourdomain.com"
+  },
+  {
+   "depends_on": "eval:doc.provider=='Twilio'",
+   "fieldname": "section_twilio",
+   "fieldtype": "Section Break",
+   "label": "Twilio Settings"
+  },
+  {
+   "depends_on": "eval:doc.provider=='Twilio'",
+   "fieldname": "twilio_account_sid",
+   "fieldtype": "Data",
+   "label": "Twilio Account SID"
+  },
+  {
+   "depends_on": "eval:doc.provider=='Twilio'",
+   "fieldname": "twilio_auth_token",
+   "fieldtype": "Password",
+   "label": "Twilio Auth Token"
+  },
+  {
+   "fieldname": "column_break_tw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "depends_on": "eval:doc.provider=='Twilio'",
+   "fieldname": "twilio_phone_number",
+   "fieldtype": "Data",
+   "label": "Twilio Phone Number"
+  },
+  {
+   "fieldname": "section_erpnext",
+   "fieldtype": "Section Break",
+   "label": "ERPNext Integration"
+  },
+  {
+   "fieldname": "pdf_print_formats",
+   "fieldtype": "Table",
+   "label": "PDF Print Formats per Document Type",
+   "options": "DL WhatsApp PDF Format",
+   "description": "Set a default print format for each document type. When sending a PDF, the matching format will be used automatically."
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-05-14 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "DlWhatsApp",
+ "name": "DL WhatsApp Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 1
+}

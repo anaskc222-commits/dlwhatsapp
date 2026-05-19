@@ -1,0 +1,144 @@
+{
+ "charts": [],
+ "content": "[{\"id\":\"shortcut_chat\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Chat\",\"col\":3}},{\"id\":\"shortcut_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"DL WhatsApp Settings\",\"col\":3}},{\"id\":\"card_comm\",\"type\":\"card\",\"data\":{\"card_name\":\"Communication\",\"col\":4}},{\"id\":\"card_config\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":4}},{\"id\":\"card_logs\",\"type\":\"card\",\"data\":{\"card_name\":\"Logs & Reports\",\"col\":4}}]",
+ "creation": "2026-05-13 00:00:00.000000",
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "brand-whatsapp",
+ "idx": 0,
+ "is_hidden": 0,
+ "label": "DL WhatsApp",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Communication",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "WhatsApp Chat",
+   "link_count": 0,
+   "link_to": "dlwhatsapp-chat",
+   "link_type": "Page",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Contact",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Contact",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Message",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Message",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Configuration",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Settings",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Settings",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Account",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Account",
+   "link_type": "DocType",
+   "onboard": 1,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Template",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Template",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Notification",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Notification",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Logs & Reports",
+   "link_count": 0,
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "DL WhatsApp Log",
+   "link_count": 0,
+   "link_to": "DL WhatsApp Log",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2026-05-13 00:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "DlWhatsApp",
+ "name": "DL WhatsApp",
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "sequence_id": 90,
+ "shortcuts": [
+  {
+   "color": "Green",
+   "format": "{} Unread",
+   "label": "WhatsApp Chat",
+   "link_to": "dlwhatsapp-chat",
+   "stats_filter": "",
+   "type": "Page"
+  },
+  {
+   "color": "Grey",
+   "label": "DL WhatsApp Settings",
+   "link_to": "DL WhatsApp Settings",
+   "type": "DocType"
+  }
+ ],
+ "title": "DL WhatsApp"
+}
