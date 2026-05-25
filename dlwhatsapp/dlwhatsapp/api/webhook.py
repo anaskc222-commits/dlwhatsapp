@@ -170,7 +170,7 @@ def _download_and_attach(doc_data, media_id, account, msg_type):
     try:
         token = account.get_password("token")
         headers = {"Authorization": f"Bearer {token}"}
-        api_base = f"{account.url or 'https://graph.facebook.com'}/{account.version or 'v21.0'}"
+        api_base = f"{account.url or 'https://graph.facebook.com'}/{account.version or 'v25.0'}"
 
         r = requests.get(f"{api_base}/{media_id}", headers=headers, timeout=15)
         if not r.ok:

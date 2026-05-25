@@ -4,7 +4,7 @@ Whitelisted API endpoints for the chat page and form integrations.
 import json
 import frappe
 from frappe import _
-from frappe.utils import cint
+from frappe.utils import cint, now_datetime, add_days
 
 from dlwhatsapp.dlwhatsapp.doctype.dl_whatsapp_account.dl_whatsapp_account import (
     get_default_account,
@@ -19,10 +19,21 @@ def send_message(to, message, content_type="text", attach=None, reply_to=None, a
     """Send a WhatsApp message — called from chat page."""
     frappe.has_permission("DL WhatsApp Message", "create", throw=True)
 
+    phone = normalize_phone(to)
+
+    # Text messages require an active 24h session (customer replied within last 24h).
+    # If no session exists, send dlits_hello template and tell the frontend to wait.
+    if content_type == "text" and not _has_active_session(phone):
+        hello_sent = _send_welcome_if_configured(phone, account)
+        return {
+            "session_required": True,
+            "hello_sent": hello_sent,
+        }
+
     doc_data = {
         "doctype": "DL WhatsApp Message",
         "type": "Outgoing",
-        "to": normalize_phone(to),
+        "to": phone,
         "content_type": content_type,
         "message": message,
         "attach": attach,
@@ -69,19 +80,27 @@ def send_template(to, template, reference_doctype=None, reference_name=None,
 
 @frappe.whitelist()
 def send_document_pdf(to, doctype, docname, print_format=None, template=None, account=None, caption=None):
-    """Generate PDF for a document and send it as a WhatsApp attachment."""
+    """Generate PDF for a document and send it as a WhatsApp attachment.
+
+    If a Document Template (with DOCUMENT header) is configured for this doctype in Settings,
+    it is sent as a template message — this bypasses the 24-hour session requirement and
+    works for initiating conversations with new contacts.
+    """
     frappe.has_permission(doctype, "print", docname, throw=True)
 
     fmt_row = _get_pdf_format_row(doctype)
     if not print_format:
         print_format = fmt_row.get("print_format") if fmt_row else None
-
     if not caption:
         caption = (fmt_row.get("message_caption") if fmt_row else None) or docname
 
+    # Use document template from Settings if not explicitly passed
+    if not template and fmt_row:
+        template = fmt_row.get("send_template")
+
+    # Generate PDF and upload as public file
     pdf_data = frappe.get_print(doctype, docname, print_format, as_pdf=True)
     fname = f"{docname}.pdf"
-
     file_doc = frappe.get_doc({
         "doctype": "File",
         "file_name": fname,
@@ -90,30 +109,138 @@ def send_document_pdf(to, doctype, docname, print_format=None, template=None, ac
     }).insert(ignore_permissions=True)
 
     if template:
-        send_template(to, template, reference_doctype=doctype,
-                      reference_name=docname, account=account)
+        # Send as a document-header template — no active session needed
+        tpl_doc = frappe.get_doc("DL WhatsApp Template", template)
+        # Build body params from the linked document fields
+        body_params = _build_template_body_params(tpl_doc, doctype, docname, caption)
 
-    doc_data = {
-        "doctype": "DL WhatsApp Message",
-        "type": "Outgoing",
-        "to": normalize_phone(to),
-        "content_type": "document",
-        "message": caption,
-        "attach": file_doc.file_url,
-        "reference_doctype": doctype,
-        "reference_name": docname,
-        "account": account,
-    }
+        doc_data = {
+            "doctype": "DL WhatsApp Message",
+            "type": "Outgoing",
+            "to": normalize_phone(to),
+            "content_type": "template",
+            "template": template,
+            "template_parameters": frappe.as_json(body_params),
+            "attach": file_doc.file_url,
+            "message": caption,
+            "reference_doctype": doctype,
+            "reference_name": docname,
+            "account": account,
+        }
+    else:
+        # Send as plain document — requires an active 24h session
+        doc_data = {
+            "doctype": "DL WhatsApp Message",
+            "type": "Outgoing",
+            "to": normalize_phone(to),
+            "content_type": "document",
+            "message": caption,
+            "attach": file_doc.file_url,
+            "reference_doctype": doctype,
+            "reference_name": docname,
+            "account": account,
+        }
+
+    # Check for active 24-hour session before sending non-template document
+    if doc_data.get("content_type") == "document":
+        phone = normalize_phone(to)
+        if not _has_active_session(phone):
+            # No session — try welcome template if configured
+            welcome_tpl = frappe.db.get_single_value("DL WhatsApp Settings", "welcome_template")
+            if welcome_tpl:
+                welcome = _send_welcome_if_configured(phone, account)
+                if welcome:
+                    return {
+                        "welcome_sent": True,
+                        "phone": phone,
+                        "doctype": doctype,
+                        "docname": docname,
+                        "file_url": file_doc.file_url,
+                        "message": _(
+                            "No active conversation with this customer. "
+                            "A welcome message has been sent. "
+                            "Once they reply, open the chat to send the PDF."
+                        ),
+                    }
+            # No template configured or welcome failed — inform the user
+            frappe.throw(_(
+                "No active WhatsApp conversation with this customer in the last 24 hours. "
+                "Ask the customer to send any message to {0} first, "
+                "then try again."
+            ).format(
+                frappe.db.get_value("DL WhatsApp Account",
+                    frappe.db.get_single_value("DL WhatsApp Settings", "default_account") or account,
+                    "phone_number") or "your WhatsApp number"
+            ))
+
     msg = frappe.get_doc(doc_data).insert()
     return {"name": msg.name, "file_url": file_doc.file_url, "status": msg.status}
 
 
+def _has_active_session(phone):
+    """Return True if there is an incoming message from this contact within the last 24 hours."""
+    cutoff = add_days(now_datetime(), -1)
+    return frappe.db.exists(
+        "DL WhatsApp Message",
+        {"contact": phone, "type": "Incoming", "creation": [">", str(cutoff)]},
+    )
+
+
+def _send_welcome_if_configured(phone, account=None):
+    """Send the welcome template to a contact if one is configured in Settings."""
+    welcome_tpl = frappe.db.get_single_value("DL WhatsApp Settings", "welcome_template")
+    if not welcome_tpl:
+        return False
+    try:
+        # Pass contact name as {{1}} if the template uses variables
+        contact_name = (
+            frappe.db.get_value("DL WhatsApp Contact", phone, "contact_name") or phone
+        )
+        tpl_doc = frappe.get_doc("DL WhatsApp Template", welcome_tpl)
+        params = None
+        if "{{1}}" in (tpl_doc.body_text or "") or tpl_doc.field_names:
+            params = frappe.as_json([contact_name])
+
+        frappe.get_doc({
+            "doctype": "DL WhatsApp Message",
+            "type": "Outgoing",
+            "to": phone,
+            "content_type": "template",
+            "template": welcome_tpl,
+            "template_parameters": params,
+            "account": account,
+        }).insert(ignore_permissions=True)
+        return True
+    except Exception:
+        frappe.log_error("DL WhatsApp Welcome Send Error", frappe.get_traceback())
+        return False
+
+
+def _build_template_body_params(tpl_doc, doctype, docname, fallback_caption):
+    """Build body parameter list from template field_names or fallback to caption."""
+    params = []
+    if tpl_doc.field_names:
+        try:
+            ref_doc = frappe.get_doc(doctype, docname)
+            for f in tpl_doc.field_names.split(","):
+                params.append(str(ref_doc.get(f.strip()) or ""))
+        except Exception:
+            params = [fallback_caption]
+    else:
+        params = [fallback_caption]
+    return params
+
+
 @frappe.whitelist()
 def get_pdf_print_format(doctype):
-    """Return the default print format and caption configured for a doctype."""
+    """Return the default print format, template and caption configured for a doctype."""
     row = _get_pdf_format_row(doctype)
     if row:
-        return {"print_format": row.get("print_format"), "caption": row.get("message_caption")}
+        return {
+            "print_format": row.get("print_format"),
+            "caption": row.get("message_caption"),
+            "send_template": row.get("send_template"),
+        }
     return {}
 
 
@@ -123,7 +250,7 @@ def _get_pdf_format_row(doctype):
         rows = frappe.get_all(
             "DL WhatsApp PDF Format",
             filters={"parent": "DL WhatsApp Settings", "document_type": doctype},
-            fields=["print_format", "message_caption"],
+            fields=["print_format", "message_caption", "send_template"],
             limit=1,
         )
         return rows[0] if rows else {}
@@ -234,7 +361,7 @@ def test_connection(account=None):
             return {"success": False, "error": "No account configured"}
         import requests
         token = acc.get_password("token")
-        url = f"{acc.url or 'https://graph.facebook.com'}/{acc.version or 'v21.0'}/{acc.phone_id}"
+        url = f"{acc.url or 'https://graph.facebook.com'}/{acc.version or 'v25.0'}/{acc.phone_id}"
         r = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=10)
         if r.ok:
             return {"success": True, "data": r.json()}
@@ -257,7 +384,7 @@ def sync_templates(account=None):
         import requests
         token = acc.get_password("token")
         url = (
-            f"{acc.url or 'https://graph.facebook.com'}/{acc.version or 'v21.0'}"
+            f"{acc.url or 'https://graph.facebook.com'}/{acc.version or 'v25.0'}"
             f"/{acc.business_id}/message_templates"
         )
         r = requests.get(url, headers={"Authorization": f"Bearer {token}"}, timeout=15)
@@ -270,15 +397,28 @@ def sync_templates(account=None):
             if not name:
                 continue
             existing = frappe.db.exists("DL WhatsApp Template", name)
-            body_text = ""
+
+            # Parse all components
+            body_text = footer_text = header_text = header_type = ""
             for comp in tpl.get("components", []):
-                if comp.get("type") == "BODY":
+                ctype = comp.get("type", "").upper()
+                if ctype == "BODY":
                     body_text = comp.get("text", "")
+                elif ctype == "FOOTER":
+                    footer_text = comp.get("text", "")
+                elif ctype == "HEADER":
+                    fmt = comp.get("format", "").upper()
+                    header_type = fmt  # TEXT, IMAGE, DOCUMENT, VIDEO
+                    if fmt == "TEXT":
+                        header_text = comp.get("text", "")
 
             if existing:
                 frappe.db.set_value("DL WhatsApp Template", name, {
                     "status": tpl.get("status", "").capitalize(),
                     "body_text": body_text,
+                    "footer_text": footer_text,
+                    "header_type": header_type,
+                    "header_text": header_text,
                     "meta_template_id": tpl.get("id"),
                 })
             else:
@@ -289,6 +429,9 @@ def sync_templates(account=None):
                     "category": tpl.get("category", "UTILITY"),
                     "status": tpl.get("status", "Pending").capitalize(),
                     "body_text": body_text,
+                    "footer_text": footer_text,
+                    "header_type": header_type,
+                    "header_text": header_text,
                     "meta_template_id": tpl.get("id"),
                     "account": acc.name,
                 }).insert(ignore_permissions=True)

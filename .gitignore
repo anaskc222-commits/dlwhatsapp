@@ -1,55 +1,31 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
-*$py.class
-*.pyc
-*.py~
-
-# Distribution / packaging
-.Python
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib64/
-parts/
-sdist/
-var/
-wheels/
+*.pyo
 *.egg-info/
-.installed.cfg
-*.egg
-tags
-MANIFEST
+dist/
+build/
+.eggs/
 
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# Dependency directories
+# Node
 node_modules/
-jspm_packages/
+*.min.js.map
 
-# IDEs and editors
+# Frappe build artifacts
+dlwhatsapp/public/js/*.bundle.js
+dlwhatsapp/public/css/*.bundle.css
+
+# Environment
+.env
+.env.*
+*.local
+
+# IDE
 .vscode/
-.vs/
 .idea/
-.kdev4/
-*.kdev4
-*.DS_Store
 *.swp
-*.comp.js
-.wnf-lang-status
-*debug.log
+*.swo
 
-# Helix Editor
-.helix/
-
-# Aider AI Chat
-.aider*
+# OS
+.DS_Store
+Thumbs.db

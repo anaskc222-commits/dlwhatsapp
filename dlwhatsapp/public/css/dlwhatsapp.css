@@ -548,3 +548,26 @@
 	background: var(--border-color);
 	border-radius: 2px;
 }
+
+/* ---------- Session banner ---------- */
+.dlwa-session-banner {
+	display: flex;
+	align-items: flex-start;
+	gap: 7px;
+	margin: 10px auto;
+	padding: 9px 14px;
+	max-width: 72%;
+	background: #fff8e1;
+	border: 1px solid #ffe082;
+	border-radius: 10px;
+	color: #7a5c00;
+	font-size: 12.5px;
+	line-height: 1.5;
+	text-align: center;
+	justify-content: center;
+}
+[data-theme="dark"] .dlwa-session-banner {
+	background: #2d2500;
+	border-color: #5a4400;
+	color: #ffd54f;
+}

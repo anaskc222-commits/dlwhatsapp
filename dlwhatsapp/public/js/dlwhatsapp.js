@@ -137,7 +137,31 @@
 								},
 								freeze: true,
 								freeze_message: __("Generating and sending PDF..."),
-								callback: _done,
+								callback(r) {
+									if (r.message && r.message.welcome_sent) {
+										const contact_phone = r.message.phone;
+										frappe.msgprint({
+											title: __("Welcome Message Sent 👋"),
+											message: `<div style="line-height:1.8">
+												<p>📩 <b>${__("A welcome message has been sent to")} <code>${phone_clean}</code></b></p>
+												<p style="color:var(--text-muted)">
+													${__("This customer has no active WhatsApp conversation yet.")}
+													${__("Once they reply, open the chat and send the PDF.")}
+												</p>
+												<hr style="margin:10px 0">
+												<button class="btn btn-primary btn-sm"
+													onclick="frappe.set_route('dlwhatsapp-chat','${contact_phone}');cur_dialog && cur_dialog.hide()">
+													📱 ${__("Open Chat")}
+												</button>
+											</div>`,
+											indicator: "blue",
+										});
+										_add_timeline_comment(frm, "Welcome", phone_clean,
+											"Welcome message sent — awaiting reply to send PDF");
+									} else {
+										_done();
+									}
+								},
 							});
 						} else {
 							frappe.call({

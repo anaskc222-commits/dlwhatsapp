@@ -113,27 +113,56 @@ class DLWhatsAppMessage(Document):
             frappe.throw(_("Template is required for template messages"))
         tpl = frappe.get_doc("DL WhatsApp Template", self.template)
         to = normalize_phone(self.to)
-        data = {
+        components = []
+
+        # Header component — supports DOCUMENT, IMAGE, TEXT, VIDEO
+        header_type = (tpl.header_type or "").upper()
+        if header_type == "DOCUMENT" and self.attach:
+            link = _get_public_base_url().rstrip("/") + self.attach \
+                if not self.attach.startswith("http") else self.attach
+            fname = self.attach.rsplit("/", 1)[-1] or "document.pdf"
+            components.append({
+                "type": "header",
+                "parameters": [{
+                    "type": "document",
+                    "document": {"link": link, "filename": fname},
+                }],
+            })
+        elif header_type == "IMAGE" and self.attach:
+            link = _get_public_base_url().rstrip("/") + self.attach \
+                if not self.attach.startswith("http") else self.attach
+            components.append({
+                "type": "header",
+                "parameters": [{"type": "image", "image": {"link": link}}],
+            })
+        elif header_type == "TEXT" and tpl.header_text:
+            components.append({
+                "type": "header",
+                "parameters": [{"type": "text", "text": tpl.header_text}],
+            })
+
+        # Body parameters
+        body_params = []
+        if self.template_parameters:
+            try:
+                vals = json.loads(self.template_parameters)
+                for v in (vals if isinstance(vals, list) else vals.values()):
+                    body_params.append({"type": "text", "text": str(v)})
+            except Exception:
+                pass
+        if body_params:
+            components.append({"type": "body", "parameters": body_params})
+
+        return {
             "messaging_product": "whatsapp",
             "to": to,
             "type": "template",
             "template": {
                 "name": tpl.template_name,
                 "language": {"code": tpl.language_code or "en"},
-                "components": [],
+                "components": components,
             },
         }
-        params = []
-        if self.template_parameters:
-            try:
-                vals = json.loads(self.template_parameters)
-                for v in (vals if isinstance(vals, list) else vals.values()):
-                    params.append({"type": "text", "text": str(v)})
-            except Exception:
-                pass
-        if params:
-            data["template"]["components"].append({"type": "body", "parameters": params})
-        return data
 
     def _get_media_link(self):
         if self.attach:

@@ -3,6 +3,7 @@
  "content": "[{\"id\":\"shortcut_chat\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"WhatsApp Chat\",\"col\":3}},{\"id\":\"shortcut_settings\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"DL WhatsApp Settings\",\"col\":3}},{\"id\":\"card_comm\",\"type\":\"card\",\"data\":{\"card_name\":\"Communication\",\"col\":4}},{\"id\":\"card_config\",\"type\":\"card\",\"data\":{\"card_name\":\"Configuration\",\"col\":4}},{\"id\":\"card_logs\",\"type\":\"card\",\"data\":{\"card_name\":\"Logs & Reports\",\"col\":4}}]",
  "creation": "2026-05-13 00:00:00.000000",
  "docstatus": 0,
+ "app": "dlwhatsapp",
  "doctype": "Workspace",
  "for_user": "",
  "hide_custom": 0,

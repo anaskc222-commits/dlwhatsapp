@@ -13,6 +13,8 @@
   "enable_notifications",
   "section_urls",
   "public_base_url",
+  "section_welcome",
+  "welcome_template",
   "section_twilio",
   "twilio_account_sid",
   "twilio_auth_token",
@@ -67,6 +69,18 @@
    "label": "Public Base URL",
    "description": "Public URL of your server used for WhatsApp media links (e.g. https://erp.dlitsksa.com). Must be reachable from the internet.",
    "placeholder": "https://erp.yourdomain.com"
+  },
+  {
+   "fieldname": "section_welcome",
+   "fieldtype": "Section Break",
+   "label": "Welcome Message"
+  },
+  {
+   "fieldname": "welcome_template",
+   "fieldtype": "Link",
+   "label": "Welcome Template",
+   "options": "DL WhatsApp Template",
+   "description": "Sent automatically when a customer has no prior conversation. Must be an approved Meta template. After the customer replies, documents can be sent freely."
   },
   {
    "depends_on": "eval:doc.provider=='Twilio'",

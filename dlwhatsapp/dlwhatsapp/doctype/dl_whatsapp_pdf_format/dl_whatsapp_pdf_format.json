@@ -7,6 +7,7 @@
  "field_order": [
   "document_type",
   "print_format",
+  "send_template",
   "message_caption"
  ],
  "fields": [
@@ -17,7 +18,7 @@
    "label": "Document Type",
    "options": "DocType",
    "reqd": 1,
-   "columns": 4
+   "columns": 3
   },
   {
    "fieldname": "print_format",
@@ -26,21 +27,30 @@
    "label": "Print Format",
    "options": "Print Format",
    "reqd": 1,
-   "columns": 4
+   "columns": 3
+  },
+  {
+   "fieldname": "send_template",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Document Template",
+   "options": "DL WhatsApp Template",
+   "description": "Template with DOCUMENT header — used to send PDF without needing an active session. Leave blank to send as plain document (requires prior conversation).",
+   "columns": 3
   },
   {
    "fieldname": "message_caption",
    "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Caption (optional)",
-   "description": "Caption sent with the PDF. Leave blank to use document name.",
-   "columns": 4
+   "label": "Caption",
+   "description": "Caption / body text sent with the PDF. Used when no template is set.",
+   "columns": 3
   }
  ],
  "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-05-14 00:00:00.000000",
+ "modified": "2026-05-19 00:00:00.000000",
  "modified_by": "Administrator",
  "module": "DlWhatsApp",
  "name": "DL WhatsApp PDF Format",

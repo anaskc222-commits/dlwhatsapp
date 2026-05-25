@@ -104,7 +104,8 @@
   {
    "fieldname": "business_id",
    "fieldtype": "Data",
-   "label": "Business Account ID"
+   "label": "WhatsApp Business Account ID (WABA ID)",
+   "description": "The WABA ID from Meta Business Manager — used for template sync. Different from the Meta Business Account ID."
   },
   {
    "fieldname": "webhook_verify_token",

@@ -345,15 +345,44 @@ class DLWhatsAppChatPage {
 	_send_message() {
 		const msg = (this.$input.val() || "").trim();
 		if (!msg || !this.current_contact) return;
-		this.$input.val("").css("height", "auto");
 
 		frappe.call({
 			method: "dlwhatsapp.dlwhatsapp.api.send.send_message",
 			args: { to: this.current_contact, message: msg, content_type: "text" },
 			callback: (r) => {
-				if (r.message) this._load_messages(this.current_contact);
+				if (!r.message) return;
+
+				if (r.message.session_required) {
+					// No active 24h session — greeting was sent, keep message in input
+					this._show_session_banner(r.message.hello_sent);
+					this._load_messages(this.current_contact);
+					// Leave the typed message in the input so user can resend after customer replies
+				} else {
+					this.$input.val("").css("height", "auto");
+					this._load_messages(this.current_contact);
+				}
 			},
 		});
+	}
+
+	_show_session_banner(hello_sent) {
+		// Remove any existing session banner first
+		this.$messages.find(".dlwa-session-banner").remove();
+
+		const text = hello_sent
+			? __("A greeting was sent. Waiting for the customer to reply before you can send messages.")
+			: __("No active conversation in the last 24 hours. The customer needs to message you first.");
+
+		const $banner = $(`
+		<div class="dlwa-session-banner">
+			<svg viewBox="0 0 24 24" fill="currentColor" width="15" height="15" style="flex-shrink:0;margin-top:1px">
+				<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+			</svg>
+			<span>${text}</span>
+		</div>`);
+
+		this.$messages.append($banner);
+		this._scroll_bottom();
 	}
 
 	_handle_file_upload(e) {
