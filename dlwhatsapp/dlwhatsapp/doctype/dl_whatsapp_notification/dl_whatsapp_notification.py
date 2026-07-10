@@ -14,11 +14,14 @@ def trigger_notifications(doc, event):
 
     events_to_fire = [event]
 
-    # When on_update fires, also check if workflow_state changed
-    if event == "on_update" and doc.get("workflow_state"):
-        before = doc.get_doc_before_save()
-        if before and before.get("workflow_state") != doc.get("workflow_state"):
-            events_to_fire.append("on_workflow_action")
+    # When on_update fires, check if the workflow state field changed
+    if event == "on_update":
+        ws_field = _get_workflow_state_field(doc.doctype)
+        ws_after = doc.get(ws_field)
+        if ws_after:
+            before = doc.get_doc_before_save()
+            if before and before.get(ws_field) != ws_after:
+                events_to_fire.append("on_workflow_action")
 
     for ev in events_to_fire:
         _run_notifications(doc, ev)
@@ -61,9 +64,7 @@ def trigger_assignment_notifications(doc, event):
 
 def _notifications_enabled():
     try:
-        if not frappe.db.table_exists("tabDL WhatsApp Settings"):
-            return False
-        return frappe.get_single("DL WhatsApp Settings").enable_notifications
+        return bool(frappe.db.get_single_value("DL WhatsApp Settings", "enable_notifications"))
     except Exception:
         return False
 
@@ -88,7 +89,8 @@ def _run_notifications(doc, event):
 def _fire(doc, notification, event):
     # Workflow state filter — only fire if doc is in the specified state
     if event == "on_workflow_action" and notification.get("workflow_state"):
-        if doc.get("workflow_state") != notification["workflow_state"]:
+        ws_field = _get_workflow_state_field(doc.doctype)
+        if doc.get(ws_field) != notification["workflow_state"]:
             return
 
     if not _check_conditions(doc, notification):
@@ -146,6 +148,18 @@ def _send(doc, notification, phone):
         "reference_doctype": doc.doctype,
         "reference_name": doc.name,
     }).insert(ignore_permissions=True)
+
+
+def _get_workflow_state_field(doctype):
+    """Return the workflow_state_field name for the doctype's active workflow."""
+    return (
+        frappe.db.get_value(
+            "Workflow",
+            {"document_type": doctype, "is_active": 1},
+            "workflow_state_field",
+        )
+        or "workflow_state"
+    )
 
 
 def _get_user_phone(user):
