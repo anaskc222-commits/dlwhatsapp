@@ -30,6 +30,8 @@ class DLWhatsAppMessage(Document):
                 self.contact = contact.name
 
         if self.type == "Outgoing" and not self.message_id:
+            if self.content_type == "template" and self.template and not self.message:
+                self.message = self._resolve_template_body()
             self._send()
 
     def after_insert(self):
@@ -163,6 +165,20 @@ class DLWhatsAppMessage(Document):
                 "components": components,
             },
         }
+
+    def _resolve_template_body(self):
+        """Resolve template body text with parameter substitution for storage in message field."""
+        try:
+            tpl = frappe.get_doc("DL WhatsApp Template", self.template)
+            text = tpl.body_text or tpl.template_name or self.template
+            if self.template_parameters:
+                vals = json.loads(self.template_parameters)
+                if isinstance(vals, list):
+                    for i, v in enumerate(vals, 1):
+                        text = text.replace(f"{{{{{i}}}}}", str(v))
+            return text
+        except Exception:
+            return self.template
 
     def _get_media_link(self):
         if self.attach:
